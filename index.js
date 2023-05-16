@@ -86,6 +86,52 @@ async function addDepartment() {
   );
 }
 
+async function addRole() {
+  db.query("SELECT id, name FROM department", async function (err, result) {
+    if (err) {
+      console.log("ERROR:");
+      console.log(err);
+    }
+    let userResponse = await inquirer.prompt([
+      {
+        type: "input",
+        message: "What is the name of the role?",
+        name: "role",
+      },
+      {
+        type: "number",
+        message: "What is your roles salary?",
+        name: "salary",
+      },
+      {
+        type: "list",
+        message: "Choose a department for your role: ",
+        name: "dep",
+        choices: result,
+      },
+    ]);
+
+    let depId = -1;
+    for (i = 0; i < result.length; i++) {
+      if (result[i].name == userResponse.dep) {
+        depId = result[i].id;
+      }
+    }
+
+    db.query(
+      "INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);",
+      [userResponse.role, userResponse.salary, depId],
+      (err, result) => {
+        if (err) {
+          console.log("ERROR:");
+          console.log(err);
+        }
+        chooseFunction();
+      }
+    );
+  });
+}
+
 async function chooseFunction() {
   let ans = await inquirer.prompt([
     {
@@ -112,6 +158,8 @@ async function chooseFunction() {
     showEmployees();
   } else if (ans.func == "Add a Department") {
     addDepartment();
+  } else if (ans.func == "Add a Role") {
+    addRole();
   }
 }
 

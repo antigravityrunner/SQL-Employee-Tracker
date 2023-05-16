@@ -1,4 +1,4 @@
-# Emjployee Tracker Challange 12
+# Employee Tracker Challange 12
 
 My challenge 12 Employee Tracker for the bootcamp class.
 

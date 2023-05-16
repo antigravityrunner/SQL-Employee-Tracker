@@ -41,22 +41,46 @@ function showRoles() {
 
 function showEmployees() {
   db.query(
-    `SELECT \
+    'SELECT \
     employee.id, \
-    first_name, \
-    last_name, \
+    employee.first_name, \
+    employee.last_name, \
     role.title, \
     department.name as department, \
-    manager_id \
+    role.salary, \
+    CONCAT(manager.first_name, " ", manager.last_name) as manager \
     FROM employee \
     JOIN role ON employee.role_id = role.id \
-    JOIN department ON role.department_id = department.id;`,
+    JOIN department ON role.department_id = department.id \
+    LEFT OUTER JOIN employee manager ON employee.manager_id = manager.id;',
     function (err, result) {
       if (err) {
         console.log("ERROR:");
         console.log(err);
       }
       console.table(result);
+      chooseFunction();
+    }
+  );
+}
+
+async function addDepartment() {
+  let dep = await inquirer.prompt([
+    {
+      type: "input",
+      message: "What is the name of the department?",
+      name: "dep",
+    },
+  ]);
+
+  db.query(
+    `INSERT INTO department (name) VALUES (?)`,
+    dep.dep,
+    (err, result) => {
+      if (err) {
+        console.log("ERROR:");
+        console.log(err);
+      }
       chooseFunction();
     }
   );
@@ -86,6 +110,8 @@ async function chooseFunction() {
     showRoles();
   } else if (ans.func == "View All Employees") {
     showEmployees();
+  } else if (ans.func == "Add a Department") {
+    addDepartment();
   }
 }
 
